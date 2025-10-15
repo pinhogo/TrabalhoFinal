@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pinho.ipitsa.Aplicacao.Responses.CardapioResponse;
+import com.pinho.ipitsa.Dominio.Entidades.CabecalhoCardapio;
 import com.pinho.ipitsa.Dominio.Entidades.Cardapio;
 import com.pinho.ipitsa.Dominio.Entidades.Produto;
 import com.pinho.ipitsa.Dominio.Servicos.CardapioService;

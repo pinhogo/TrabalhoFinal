@@ -17,8 +17,13 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
 
     @Override
     public Cliente salvar(Cliente cliente) {
-        String sql = "MERGE INTO clientes (cpf, nome, celular, endereco, email) " +
-                     "KEY (cpf) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO clientes (cpf, nome, celular, endereco, email) " +
+                     "VALUES (?, ?, ?, ?, ?) " +
+                     "ON CONFLICT (cpf) DO UPDATE SET " +
+                     "nome = EXCLUDED.nome, " +
+                     "celular = EXCLUDED.celular, " +
+                     "endereco = EXCLUDED.endereco, " +
+                     "email = EXCLUDED.email";
         
         jdbcTemplate.update(sql, 
             cliente.getCpf(),

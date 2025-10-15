@@ -44,7 +44,7 @@ public class CardapioController {
         return cardapioPresenter;
     }
 
-    @GetMapping("/lista")
+    @GetMapping
     @CrossOrigin("*")
     public List<CabecalhoCardapioPresenter> recuperaListaCardapios(){
          List<CabecalhoCardapioPresenter> lstCardapios = 
@@ -53,7 +53,4 @@ public class CardapioController {
             .toList();
          return lstCardapios;
     }
-
-    // @GetMapping("/")
-    // @CrossOrigin("*")
 }
