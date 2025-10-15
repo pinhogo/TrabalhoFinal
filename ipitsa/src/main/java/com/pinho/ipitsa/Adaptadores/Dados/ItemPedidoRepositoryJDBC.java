@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pinho.ipitsa.Dominio.Dados.ItemPedidoRepository;
 import com.pinho.ipitsa.Dominio.Dados.ProdutosRepository;
+import com.pinho.ipitsa.Dominio.Entidades.ItemPedido;
+import com.pinho.ipitsa.Dominio.Entidades.Produto;
 
 @Component
 public class ItemPedidoRepositoryJDBC implements ItemPedidoRepository {
@@ -19,10 +21,25 @@ public class ItemPedidoRepositoryJDBC implements ItemPedidoRepository {
 
     @Override
     public ItemPedido adicionarItem(Produto item) {
-        String sql = "INSERT INTO item_pedido (produto_id, quantidade) VALUES (?, ?)";
-        jdbcTemplate.update(sql, item.getItem().getId(), item.getQuantidade());
-        return item;
+        // Cria um ItemPedido com quantidade padrão 1
+        return new ItemPedido(item, 1);
     }
 
+    @Override
+    public ItemPedido RemoverItem(Produto item) {
+        // Retorna null para indicar remoção
+        return null;
+    }
 
+    @Override
+    public ItemPedido atualizarQuantidade(Produto item, int novaQuantidade) {
+        // Cria novo ItemPedido com quantidade atualizada
+        return new ItemPedido(item, novaQuantidade);
+    }
+
+    @Override
+    public double calcularTotal(ItemPedido item) {
+        // Retorna o preço total do item
+        return item.getPrecoTotal();
+    }
 }

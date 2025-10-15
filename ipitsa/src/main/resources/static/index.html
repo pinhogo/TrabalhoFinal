@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPitsa API - Documentação</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .nav {
+            background: #2c3e50;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav button {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 20px 30px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav button:hover {
+            background: rgba(255,255,255,0.1);
+            border-bottom-color: #3498db;
+        }
+
+        .nav button.active {
+            background: #34495e;
+            border-bottom-color: #3498db;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 5px solid #3498db;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .endpoint h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+
+        .method.get { background: #28a745; color: white; }
+        .method.post { background: #007bff; color: white; }
+        .method.put { background: #ffc107; color: #333; }
+        .method.delete { background: #dc3545; color: white; }
+
+        .endpoint-url {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            font-size: 1.1em;
+        }
+
+        .params {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .params h4 {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .param-item {
+            background: #f8f9fa;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border-left: 3px solid #3498db;
+        }
+
+        .param-name {
+            font-weight: bold;
+            color: #e74c3c;
+            font-family: 'Courier New', monospace;
+        }
+
+        .param-type {
+            color: #27ae60;
+            font-style: italic;
+            margin: 0 5px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        .example-response {
+            background: #e8f5e9;
+            border-left: 5px solid #4caf50;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 5px 5px 5px 0;
+        }
+
+        .badge.required {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .badge.optional {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .try-it {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .try-it:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .status-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .status-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .status-item strong {
+            color: #3498db;
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍕 iPitsa API</h1>
+            <p>Sistema de Pedidos de Pizza - Documentação Completa da API REST</p>
+        </header>
+
+        <nav class="nav">
+            <button class="active" onclick="showSection('intro')">📋 Introdução</button>
+            <button onclick="showSection('cardapio')">📖 Cardápio</button>
+            <button onclick="showSection('cliente')">👤 Cliente</button>
+            <button onclick="showSection('pedido')">🛒 Pedido</button>
+            <button onclick="showSection('servicos')">⚙️ Serviços</button>
+        </nav>
+
+        <div class="content">
+            <!-- INTRODUÇÃO -->
+            <section id="intro" class="section active">
+                <h2>📋 Introdução</h2>
+                
+                <div class="info-box">
+                    <strong>🌐 Base URL:</strong> <code>http://localhost:8080</code>
+                </div>
+
+                <div class="success-box">
+                    <strong>✅ Status do Servidor:</strong> Rodando com Spring Boot 3.5.4
+                </div>
+
+                <h3>🎯 Recursos Disponíveis</h3>
+                <div class="status-list">
+                    <div class="status-item">
+                        <strong>📖 Cardápio</strong>
+                        <p>Consulta de cardápios e produtos</p>
+                    </div>
+                    <div class="status-item">
+                        <strong>👤 Cliente</strong>
+                        <p>Registro e autenticação</p>
+                    </div>
+                    <div class="status-item">
+                        <strong>🛒 Pedido</strong>
+                        <p>Gestão completa de pedidos</p>
+                    </div>
+                    <div class="status-item">
+                        <strong>⚙️ Serviços</strong>
+                        <p>Pagamento, estoque e entregas</p>
+                    </div>
+                </div>
+
+                <h3>📊 Status de Pedido</h3>
+                <div class="status-list">
+                    <div class="status-item"><strong>NOVO</strong></div>
+                    <div class="status-item"><strong>APROVADO</strong></div>
+                    <div class="status-item"><strong>PAGO</strong></div>
+                    <div class="status-item"><strong>AGUARDANDO</strong></div>
+                    <div class="status-item"><strong>PREPARACAO</strong></div>
+                    <div class="status-item"><strong>PRONTO</strong></div>
+                    <div class="status-item"><strong>TRANSPORTE</strong></div>
+                    <div class="status-item"><strong>ENTREGUE</strong></div>
+                    <div class="status-item"><strong>CANCELADO</strong></div>
+                </div>
+            </section>
+
+            <!-- CARDÁPIO -->
+            <section id="cardapio" class="section">
+                <h2>📖 Endpoints de Cardápio</h2>
+
+                <!-- GET /cardapio -->
+                <div class="endpoint">
+                    <h3><span class="method get">GET</span> Listar Todos os Cardápios</h3>
+                    <div class="endpoint-url">/cardapio</div>
+                    
+                    <p><strong>Descrição:</strong> Retorna a lista completa de cardápios disponíveis.</p>
+                    
+                    <div class="params">
+                        <h4>📥 Parâmetros</h4>
+                        <p>Nenhum parâmetro necessário.</p>
+                    </div>
+
+                    <h4>📤 Resposta</h4>
+                    <div class="code-block"><pre>[
+  {
+    "id": 1,
+    "titulo": "Cardapio de Agosto",
+    "produtos": [...]
+  }
+]</pre></div>
+
+                    <button class="try-it" onclick="tryRequest('GET', '/cardapio')">▶️ Testar</button>
+                </div>
+
+                <!-- GET /cardapio/{id} -->
+                <div class="endpoint">
+                    <h3><span class="method get">GET</span> Buscar Cardápio por ID</h3>
+                    <div class="endpoint-url">/cardapio/{id}</div>
+                    
+                    <p><strong>Descrição:</strong> Retorna um cardápio específico com seus produtos.</p>
+                    
+                    <div class="params">
+                        <h4>📥 Parâmetros</h4>
+                        <div class="param-item">
+                            <span class="param-name">id</span>
+                            <span class="param-type">(Long)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>ID do cardápio na URL</p>
+                        </div>
+                    </div>
+
+                    <h4>📤 Exemplo</h4>
+                    <div class="code-block"><pre>GET /cardapio/1</pre></div>
+
+                    <div class="example-response">
+                        <strong>✅ Resposta (200 OK):</strong>
+                        <div class="code-block"><pre>{
+  "id": 1,
+  "titulo": "Cardapio de Agosto",
+  "produtos": [
+    {
+      "id": 1,
+      "descricao": "Pizza calabresa",
+      "preco": 5500
+    }
+  ]
+}</pre></div>
+                    </div>
+
+                    <button class="try-it" onclick="tryRequest('GET', '/cardapio/1')">▶️ Testar</button>
+                </div>
+            </section>
+
+            <!-- CLIENTE -->
+            <section id="cliente" class="section">
+                <h2>👤 Endpoints de Cliente</h2>
+
+                <!-- POST /cliente/registrar -->
+                <div class="endpoint">
+                    <h3><span class="method post">POST</span> Registrar Novo Cliente</h3>
+                    <div class="endpoint-url">/cliente/registrar</div>
+                    
+                    <p><strong>Descrição:</strong> Registra um novo cliente no sistema.</p>
+                    
+                    <div class="params">
+                        <h4>📥 Body (JSON)</h4>
+                        <div class="param-item">
+                            <span class="param-name">cpf</span>
+                            <span class="param-type">(String)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>CPF do cliente (único)</p>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">nome</span>
+                            <span class="param-type">(String)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>Nome completo do cliente</p>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">celular</span>
+                            <span class="param-type">(String)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>Número de celular</p>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">endereco</span>
+                            <span class="param-type">(String)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>Endereço completo para entrega</p>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">email</span>
+                            <span class="param-type">(String)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>E-mail do cliente</p>
+                        </div>
+                    </div>
+
+                    <h4>📤 Exemplo de Requisição</h4>
+                    <div class="code-block"><pre>{
+  "cpf": "12345678900",
+  "nome": "João Silva",
+  "celular": "51999887766",
+  "endereco": "Rua das Flores, 123",
+  "email": "joao.silva@email.com"
+}</pre></div>
+
+                    <div class="example-response">
+                        <strong>✅ Resposta (200 OK):</strong>
+                        <div class="code-block"><pre>{
+  "cpf": "12345678900",
+  "nome": "João Silva",
+  "celular": "51999887766",
+  "endereco": "Rua das Flores, 123",
+  "email": "joao.silva@email.com"
+}</pre></div>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>⚠️ Validação:</strong> CPF deve ser único. Se já existir, retorna erro 500.
+                    </div>
+                </div>
+
+                <!-- POST /cliente/autenticar -->
+                <div class="endpoint">
+                    <h3><span class="method post">POST</span> Autenticar Cliente</h3>
+                    <div class="endpoint-url">/cliente/autenticar</div>
+                    
+                    <p><strong>Descrição:</strong> Autentica um cliente pelo CPF (autenticação simples).</p>
+                    
+                    <div class="params">
+                        <h4>📥 Body (JSON)</h4>
+                        <div class="param-item">
+                            <span class="param-name">cpf</span>
+                            <span class="param-type">(String)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>CPF do cliente</p>
+                        </div>
+                    </div>
+
+                    <h4>📤 Exemplo de Requisição</h4>
+                    <div class="code-block"><pre>{
+  "cpf": "12345678900"
+}</pre></div>
+
+                    <div class="example-response">
+                        <strong>✅ Cliente Encontrado (200 OK):</strong>
+                        <div class="code-block"><pre>{
+  "autenticado": true,
+  "mensagem": "Autenticação realizada com sucesso",
+  "cpf": "12345678900",
+  "nome": "João Silva"
+}</pre></div>
+
+                        <strong>❌ Cliente Não Encontrado (200 OK):</strong>
+                        <div class="code-block"><pre>{
+  "autenticado": false,
+  "mensagem": "Cliente não encontrado",
+  "cpf": null,
+  "nome": null
+}</pre></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PEDIDO -->
+            <section id="pedido" class="section">
+                <h2>🛒 Endpoints de Pedido</h2>
+
+                <!-- POST /pedido -->
+                <div class="endpoint">
+                    <h3><span class="method post">POST</span> Criar Novo Pedido</h3>
+                    <div class="endpoint-url">/pedido</div>
+                    
+                    <p><strong>Descrição:</strong> Submete um novo pedido com validação de estoque, cálculo de impostos e descontos.</p>
+                    
+                    <div class="params">
+                        <h4>📥 Body (JSON)</h4>
+                        <div class="param-item">
+                            <span class="param-name">clienteCpf</span>
+                            <span class="param-type">(String)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>CPF do cliente (deve existir no sistema)</p>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">itens</span>
+                            <span class="param-type">(Array)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>Lista de itens do pedido</p>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li><code>produtoId</code> (Long) - ID do produto</li>
+                                <li><code>quantidade</code> (int) - Quantidade desejada</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4>📤 Exemplo de Requisição</h4>
+                    <div class="code-block"><pre>{
+  "clienteCpf": "9001",
+  "itens": [
+    {
+      "produtoId": 1,
+      "quantidade": 2
+    },
+    {
+      "produtoId": 3,
+      "quantidade": 1
+    }
+  ]
+}</pre></div>
+
+                    <div class="example-response">
+                        <strong>✅ Resposta (200 OK):</strong>
+                        <div class="code-block"><pre>{
+  "id": 1,
+  "clienteCpf": "9001",
+  "status": "APROVADO",
+  "valor": 17325.0,
+  "quantidadeItens": 2
+}</pre></div>
+                    </div>
+
+                    <div class="success-box">
+                        <strong>🎯 Processamento Automático:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>✅ Verifica estoque (FAKE - sempre disponível)</li>
+                            <li>✅ Calcula impostos (10% padrão)</li>
+                            <li>✅ Calcula descontos (baseado no valor)</li>
+                            <li>✅ Reserva estoque</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- GET /pedido/{id}/status -->
+                <div class="endpoint">
+                    <h3><span class="method get">GET</span> Consultar Status do Pedido</h3>
+                    <div class="endpoint-url">/pedido/{id}/status</div>
+                    
+                    <p><strong>Descrição:</strong> Retorna o status atual de um pedido específico.</p>
+                    
+                    <div class="params">
+                        <h4>📥 Parâmetros</h4>
+                        <div class="param-item">
+                            <span class="param-name">id</span>
+                            <span class="param-type">(Long)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>ID do pedido na URL</p>
+                        </div>
+                    </div>
+
+                    <h4>📤 Exemplo</h4>
+                    <div class="code-block"><pre>GET /pedido/1/status</pre></div>
+
+                    <div class="example-response">
+                        <strong>✅ Resposta (200 OK):</strong>
+                        <div class="code-block"><pre>{
+  "pedidoId": 1,
+  "status": "APROVADO"
+}</pre></div>
+                    </div>
+
+                    <button class="try-it" onclick="tryRequest('GET', '/pedido/1/status')">▶️ Testar</button>
+                </div>
+
+                <!-- GET /pedido/{id} -->
+                <div class="endpoint">
+                    <h3><span class="method get">GET</span> Buscar Pedido Completo</h3>
+                    <div class="endpoint-url">/pedido/{id}</div>
+                    
+                    <p><strong>Descrição:</strong> Retorna todas as informações de um pedido.</p>
+                    
+                    <div class="params">
+                        <h4>📥 Parâmetros</h4>
+                        <div class="param-item">
+                            <span class="param-name">id</span>
+                            <span class="param-type">(Long)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>ID do pedido na URL</p>
+                        </div>
+                    </div>
+
+                    <h4>📤 Exemplo</h4>
+                    <div class="code-block"><pre>GET /pedido/1</pre></div>
+
+                    <button class="try-it" onclick="tryRequest('GET', '/pedido/1')">▶️ Testar</button>
+                </div>
+
+                <!-- PUT /pedido/{id}/pagar -->
+                <div class="endpoint">
+                    <h3><span class="method put">PUT</span> Pagar Pedido</h3>
+                    <div class="endpoint-url">/pedido/{id}/pagar</div>
+                    
+                    <p><strong>Descrição:</strong> Marca um pedido como pago (atualiza status para PAGO).</p>
+                    
+                    <div class="params">
+                        <h4>📥 Parâmetros</h4>
+                        <div class="param-item">
+                            <span class="param-name">id</span>
+                            <span class="param-type">(Long)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>ID do pedido na URL</p>
+                        </div>
+                    </div>
+
+                    <h4>📤 Exemplo</h4>
+                    <div class="code-block"><pre>PUT /pedido/1/pagar</pre></div>
+
+                    <div class="info-box">
+                        <strong>💳 Serviço de Pagamento FAKE:</strong> Sempre retorna sucesso.
+                    </div>
+                </div>
+
+                <!-- DELETE /pedido/{id} -->
+                <div class="endpoint">
+                    <h3><span class="method delete">DELETE</span> Cancelar Pedido</h3>
+                    <div class="endpoint-url">/pedido/{id}</div>
+                    
+                    <p><strong>Descrição:</strong> Cancela um pedido e libera o estoque reservado.</p>
+                    
+                    <div class="params">
+                        <h4>📥 Parâmetros</h4>
+                        <div class="param-item">
+                            <span class="param-name">id</span>
+                            <span class="param-type">(Long)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>ID do pedido na URL</p>
+                        </div>
+                    </div>
+
+                    <h4>📤 Exemplo</h4>
+                    <div class="code-block"><pre>DELETE /pedido/1</pre></div>
+
+                    <div class="example-response">
+                        <strong>✅ Resposta (200 OK):</strong>
+                        <div class="code-block"><pre>{
+  "id": 1,
+  "clienteCpf": "9001",
+  "status": "CANCELADO",
+  "valor": 17325.0,
+  "quantidadeItens": 2
+}</pre></div>
+                    </div>
+                </div>
+
+                <!-- GET /pedido/entregues -->
+                <div class="endpoint">
+                    <h3><span class="method get">GET</span> Listar Pedidos Entregues</h3>
+                    <div class="endpoint-url">/pedido/entregues</div>
+                    
+                    <p><strong>Descrição:</strong> Retorna todos os pedidos com status ENTREGUE em um período.</p>
+                    
+                    <div class="params">
+                        <h4>📥 Query Parameters</h4>
+                        <div class="param-item">
+                            <span class="param-name">dataInicio</span>
+                            <span class="param-type">(DateTime)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>Data/hora inicial (formato ISO 8601)</p>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">dataFim</span>
+                            <span class="param-type">(DateTime)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>Data/hora final (formato ISO 8601)</p>
+                        </div>
+                    </div>
+
+                    <h4>📤 Exemplo</h4>
+                    <div class="code-block"><pre>GET /pedido/entregues?dataInicio=2025-10-01T00:00:00&dataFim=2025-10-31T23:59:59</pre></div>
+
+                    <button class="try-it" onclick="tryRequest('GET', '/pedido/entregues?dataInicio=2025-10-01T00:00:00&dataFim=2025-10-31T23:59:59')">▶️ Testar</button>
+                </div>
+
+                <!-- GET /pedido/cliente/{cpf}/entregues -->
+                <div class="endpoint">
+                    <h3><span class="method get">GET</span> Listar Pedidos Entregues do Cliente</h3>
+                    <div class="endpoint-url">/pedido/cliente/{cpf}/entregues</div>
+                    
+                    <p><strong>Descrição:</strong> Retorna pedidos entregues de um cliente específico em um período.</p>
+                    
+                    <div class="params">
+                        <h4>📥 Parâmetros</h4>
+                        <div class="param-item">
+                            <span class="param-name">cpf</span>
+                            <span class="param-type">(String)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>CPF do cliente na URL</p>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">dataInicio</span>
+                            <span class="param-type">(DateTime)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>Data/hora inicial (query param)</p>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-name">dataFim</span>
+                            <span class="param-type">(DateTime)</span>
+                            <span class="badge required">OBRIGATÓRIO</span>
+                            <p>Data/hora final (query param)</p>
+                        </div>
+                    </div>
+
+                    <h4>📤 Exemplo</h4>
+                    <div class="code-block"><pre>GET /pedido/cliente/9001/entregues?dataInicio=2025-10-01T00:00:00&dataFim=2025-10-31T23:59:59</pre></div>
+
+                    <button class="try-it" onclick="tryRequest('GET', '/pedido/cliente/9001/entregues?dataInicio=2025-10-01T00:00:00&dataFim=2025-10-31T23:59:59')">▶️ Testar</button>
+                </div>
+            </section>
+
+            <!-- SERVIÇOS -->
+            <section id="servicos" class="section">
+                <h2>⚙️ Serviços Implementados</h2>
+
+                <div class="endpoint">
+                    <h3>💰 Calculadora de Impostos</h3>
+                    <p><strong>Tipo:</strong> Serviço Flexível</p>
+                    <p><strong>Status:</strong> ✅ Ativo</p>
+                    
+                    <div class="success-box">
+                        <strong>Fórmula Atual:</strong> 10% sobre o valor do pedido
+                    </div>
+
+                    <h4>Estratégias Disponíveis:</h4>
+                    <ul style="margin: 15px 0 15px 20px;">
+                        <li>📊 <strong>Padrão:</strong> 10% fixo</li>
+                        <li>📊 <strong>Personalizado:</strong> Percentual customizado</li>
+                        <li>📊 <strong>Progressivo:</strong> 5% até R$50, 8% até R$100, 12% acima</li>
+                    </ul>
+
+                    <div class="info-box">
+                        <strong>🔧 Flexível:</strong> Fórmulas podem ser alteradas facilmente sem impactar outras camadas.
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <h3>🎁 Calculadora de Descontos</h3>
+                    <p><strong>Tipo:</strong> Serviço Flexível</p>
+                    <p><strong>Status:</strong> ✅ Ativo</p>
+                    
+                    <div class="success-box">
+                        <strong>Fórmula Atual:</strong>
+                        <ul style="margin: 10px 0 0 20px;">
+                            <li>Até R$ 100: 0%</li>
+                            <li>R$ 100 - R$ 200: 5%</li>
+                            <li>Acima R$ 200: 10%</li>
+                        </ul>
+                    </div>
+
+                    <h4>Estratégias Disponíveis:</h4>
+                    <ul style="margin: 15px 0 15px 20px;">
+                        <li>🎯 <strong>Por Valor:</strong> Baseado no valor total</li>
+                        <li>🎯 <strong>Por Quantidade:</strong> 3+ itens = 5%, 5+ = 10%, 10+ = 15%</li>
+                        <li>🎯 <strong>Fidelidade:</strong> 15% para clientes fiéis</li>
+                        <li>🎯 <strong>Cupom:</strong> Percentual personalizado</li>
+                        <li>🎯 <strong>Fixo:</strong> Valor fixo em reais</li>
+                    </ul>
+                </div>
+
+                <div class="endpoint">
+                    <h3>💳 Serviço de Pagamento</h3>
+                    <p><strong>Tipo:</strong> FAKE (Simulação)</p>
+                    <p><strong>Status:</strong> ✅ Sempre Aprovado</p>
+                    
+                    <div class="info-box">
+                        <strong>⚠️ FAKE:</strong> Este é um serviço de simulação que sempre retorna sucesso. Ideal para desenvolvimento e testes.
+                    </div>
+
+                    <h4>Funcionalidades:</h4>
+                    <ul style="margin: 15px 0 15px 20px;">
+                        <li>✅ Processar pagamento (sempre aprovado)</li>
+                        <li>✅ Verificar status (sempre "APROVADO")</li>
+                        <li>✅ Estornar pagamento (sempre sucesso)</li>
+                        <li>✅ Logs detalhados no console</li>
+                    </ul>
+                </div>
+
+                <div class="endpoint">
+                    <h3>📦 Serviço de Estoque</h3>
+                    <p><strong>Tipo:</strong> FAKE (Simulação)</p>
+                    <p><strong>Status:</strong> ✅ Sempre Disponível</p>
+                    
+                    <div class="info-box">
+                        <strong>⚠️ FAKE:</strong> Este serviço sempre retorna que há estoque suficiente para qualquer produto.
+                    </div>
+
+                    <h4>Funcionalidades:</h4>
+                    <ul style="margin: 15px 0 15px 20px;">
+                        <li>✅ Verificar estoque (sempre disponível)</li>
+                        <li>✅ Reservar itens (sempre sucesso)</li>
+                        <li>✅ Liberar reserva (ao cancelar)</li>
+                        <li>✅ Baixar estoque (ao finalizar)</li>
+                        <li>✅ Logs detalhados no console</li>
+                    </ul>
+                </div>
+
+                <div class="endpoint">
+                    <h3>🚚 Serviço de Entregas</h3>
+                    <p><strong>Tipo:</strong> FAKE com Persistência</p>
+                    <p><strong>Status:</strong> ✅ Ativo</p>
+                    
+                    <div class="success-box">
+                        <strong>✨ Especial:</strong> Este serviço FAKE simula entregas E atualiza o status do pedido no banco de dados (similar ao serviço de cozinha).
+                    </div>
+
+                    <h4>Funcionalidades:</h4>
+                    <ul style="margin: 15px 0 15px 20px;">
+                        <li>🚀 Iniciar entrega (status → TRANSPORTE)</li>
+                        <li>✅ Concluir entrega (status → ENTREGUE)</li>
+                        <li>🔄 Simular entrega completa</li>
+                        <li>📍 Verificar status da entrega</li>
+                        <li>❌ Cancelar entrega</li>
+                        <li>💾 Atualiza banco de dados</li>
+                    </ul>
+
+                    <h4>Fluxo de Status:</h4>
+                    <div class="code-block"><pre>APROVADO → PREPARACAO → PRONTO → TRANSPORTE → ENTREGUE
+                                  ↓ cancelar
+                                PRONTO</pre></div>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <h3>🍕 iPitsa API</h3>
+            <p>Sistema de Pedidos de Pizza</p>
+            <p style="margin-top: 15px; opacity: 0.8;">
+                📚 Documentação Completa | 
+                🚀 Spring Boot 3.5.4 | 
+                ☕ Java 24 | 
+                🗄️ H2 Database
+            </p>
+            <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.7;">
+                © 2025 - Desenvolvido com DDD + Clean Architecture
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Esconde todas as seções
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active de todos os botões
+            document.querySelectorAll('.nav button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Mostra a seção selecionada
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Marca o botão como ativo
+            event.target.classList.add('active');
+            
+            // Scroll para o topo
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function tryRequest(method, endpoint) {
+            const baseUrl = 'http://localhost:8080';
+            const fullUrl = baseUrl + endpoint;
+            
+            // Abre em nova aba
+            if (method === 'GET') {
+                window.open(fullUrl, '_blank');
+            } else {
+                alert(`Para testar ${method} ${endpoint}, use:\n\ncurl -X ${method} ${fullUrl}`);
+            }
+        }
+
+        // Adiciona animação aos endpoints ao rolar
+        window.addEventListener('scroll', () => {
+            document.querySelectorAll('.endpoint').forEach(endpoint => {
+                const rect = endpoint.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 100) {
+                    endpoint.style.opacity = '1';
+                    endpoint.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        // Inicializa
+        document.querySelectorAll('.endpoint').forEach(endpoint => {
+            endpoint.style.opacity = '0';
+            endpoint.style.transform = 'translateY(20px)';
+            endpoint.style.transition = 'all 0.5s ease';
+        });
+    </script>
+</body>
+</html>

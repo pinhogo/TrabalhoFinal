@@ -27,17 +27,23 @@ public class PedidoRepositoryJDBC implements PedidoRepository{
     @Override
     public Pedido salvar(Pedido pedido){
         String sql = "INSERT INTO pedidos (cliente_cpf, data_pedido, status, valor, imposto, desconto, total) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, 
-            pedido.getCliente().getCpf(), 
-            pedido.getDataHoraPagamento(), 
-            pedido.getStatus().toString(), 
-            pedido.getValor(),
-            pedido.getImpostos(),
-            pedido.getDesconto(),
-            pedido.getValorCobrado()
-        );
-        // Recupera o ID gerado pelo banco
-        Long id = jdbcTemplate.queryForObject("SELECT IDENTITY()", Long.class);
+        
+        org.springframework.jdbc.support.KeyHolder keyHolder = new org.springframework.jdbc.support.GeneratedKeyHolder();
+        
+        jdbcTemplate.update(connection -> {
+            java.sql.PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, pedido.getCliente().getCpf());
+            ps.setObject(2, pedido.getDataHoraPagamento());
+            ps.setString(3, pedido.getStatus().toString());
+            ps.setDouble(4, pedido.getValor());
+            ps.setDouble(5, pedido.getImpostos());
+            ps.setDouble(6, pedido.getDesconto());
+            ps.setDouble(7, pedido.getValorCobrado());
+            return ps;
+        }, keyHolder);
+        
+        // Recupera o ID gerado
+        Long id = keyHolder.getKey().longValue();
         // Retorna uma NOVA instância com o ID (imutável)
         return pedido.comId(id);
     }
