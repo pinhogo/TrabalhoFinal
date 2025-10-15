@@ -1,11 +1,16 @@
 package com.pinho.ipitsa.Adaptadores.Dados;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
+import com.pinho.ipitsa.Dominio.Dados.ClienteRepository;
 import com.pinho.ipitsa.Dominio.Dados.PedidoRepository;
 import com.pinho.ipitsa.Dominio.Dados.ProdutosRepository;
 import com.pinho.ipitsa.Dominio.Entidades.Cliente;
@@ -17,21 +22,41 @@ import com.pinho.ipitsa.Dominio.Entidades.Produto;
 public class PedidoRepositoryJDBC implements PedidoRepository{
     private JdbcTemplate jdbcTemplate;
     private ProdutosRepository produtosRepository;
+    private ClienteRepository clienteRepository;
 
     @Autowired
-    public PedidoRepositoryJDBC(JdbcTemplate jdbcTemplate, ProdutosRepository produtosRepository){
+    public PedidoRepositoryJDBC(JdbcTemplate jdbcTemplate, ProdutosRepository produtosRepository, ClienteRepository clienteRepository){
         this.jdbcTemplate = jdbcTemplate;
         this.produtosRepository = produtosRepository;
+        this.clienteRepository = clienteRepository;
     }
 
     @Override
     public Pedido salvar(Pedido pedido){
+        // Se o pedido já tem ID (maior que 0), faz UPDATE
+        if (pedido.getId() > 0) {
+            String sql = "UPDATE pedidos SET cliente_cpf = ?, data_pedido = ?, status = ?, valor = ?, imposto = ?, desconto = ?, total = ? WHERE id = ?";
+            
+            jdbcTemplate.update(sql,
+                pedido.getCliente().getCpf(),
+                pedido.getDataHoraPagamento(),
+                pedido.getStatus().toString(),
+                pedido.getValor(),
+                pedido.getImpostos(),
+                pedido.getDesconto(),
+                pedido.getValorCobrado(),
+                pedido.getId()
+            );
+            
+            return pedido;
+        }
+        
         String sql = "INSERT INTO pedidos (cliente_cpf, data_pedido, status, valor, imposto, desconto, total) VALUES (?, ?, ?, ?, ?, ?, ?)";
         
-        org.springframework.jdbc.support.KeyHolder keyHolder = new org.springframework.jdbc.support.GeneratedKeyHolder();
+        KeyHolder keyHolder = new GeneratedKeyHolder();
         
         jdbcTemplate.update(connection -> {
-            java.sql.PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, pedido.getCliente().getCpf());
             ps.setObject(2, pedido.getDataHoraPagamento());
             ps.setString(3, pedido.getStatus().toString());
@@ -42,9 +67,7 @@ public class PedidoRepositoryJDBC implements PedidoRepository{
             return ps;
         }, keyHolder);
         
-        // Recupera o ID gerado
-        Long id = keyHolder.getKey().longValue();
-        // Retorna uma NOVA instância com o ID (imutável)
+        Long id = ((Number) keyHolder.getKeys().get("id")).longValue();
         return pedido.comId(id);
     }
 
@@ -55,8 +78,13 @@ public class PedidoRepositoryJDBC implements PedidoRepository{
             sql,
             ps -> ps.setLong(1, id),
             (rs, rowNum) -> {
-                // Buscar cliente pelo CPF (você pode implementar isso depois)
-                Cliente cliente = null; // clienteRepository.buscarPorCpf(rs.getString("cliente_cpf"));
+                // Buscar cliente pelo CPF
+                String cpf = rs.getString("cliente_cpf");
+                Cliente cliente = clienteRepository.buscarPorCpf(cpf);
+                
+                if (cliente == null) {
+                    throw new RuntimeException("Cliente não encontrado: " + cpf);
+                }
                 
                 // Buscar itens primeiro
                 List<ItemPedido> itens = buscarItensDoPedido(rs.getLong("id"));
@@ -88,11 +116,9 @@ public class PedidoRepositoryJDBC implements PedidoRepository{
 
     @Override
     public void excluir(long id) {
-        // Primeiro exclui os itens do pedido (relacionamento)
         String sqlItens = "DELETE FROM pedido_produto WHERE pedido_id = ?";
         jdbcTemplate.update(sqlItens, id);
         
-        // Depois exclui o pedido
         String sql = "DELETE FROM pedidos WHERE id = ?";
         jdbcTemplate.update(sql, id);
     }
@@ -129,7 +155,14 @@ public class PedidoRepositoryJDBC implements PedidoRepository{
             sql,
             ps -> ps.setString(1, status.toString()),
             (rs, rowNum) -> {
-                Cliente cliente = null; // Buscar depois se necessário
+                // Buscar cliente pelo CPF
+                String cpf = rs.getString("cliente_cpf");
+                Cliente cliente = clienteRepository.buscarPorCpf(cpf);
+                
+                if (cliente == null) {
+                    throw new RuntimeException("Cliente não encontrado: " + cpf);
+                }
+                
                 List<ItemPedido> itens = buscarItensDoPedido(rs.getLong("id"));
                 
                 return new Pedido(
